@@ -121,7 +121,7 @@ function adjustOptions( models, options ){
 
     if( models ){
         if( models instanceof Array && models.length && typeof models[ 0 ] !== 'object' ){
-            adjust.merge = adjust.parse = true;
+            adjust.remove = adjust.merge = adjust.parse = true;
         }
     }
 

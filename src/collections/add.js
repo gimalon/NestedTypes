@@ -23,6 +23,8 @@ var MergeOptions = exports.MergeOptions = function( a_options, collection ){
     this.silent = options.silent;
     this.parse  = options.parse;
     this.merge  = options.merge;
+    this.remove  = options.remove;
+
 
     // at option
     var at = options.at;
@@ -223,15 +225,17 @@ function _garbageCollect( collection, previous, options ){
 
 // reallocate model and index
 function _reallocate( self, source, options ){
-    var models      = Array( source.length ),
-        _byId       = {},
+    var remove       = options.remove == null ? true : options.remove,
+        models      =  remove ? Array( source.length ): self.models ,
+        _byId       =  remove ? {}: self._byId,
+        j           =  remove ? 0 : self.models.length,
         merge       = options.merge == null ? true : options.merge,
         _prevById   = self._byId,
         idAttribute = self.model.prototype.idAttribute,
         toAdd       = [];
 
-    // for each item in source set...
-    for( var i = 0, j = 0; i < source.length; i++ ){
+
+    for( var i = 0; i < source.length; i++ ){
         var item  = source[ i ],
             model = null;
 
@@ -239,7 +243,7 @@ function _reallocate( self, source, options ){
             var id  = item[ idAttribute ],
                 cid = item.cid;
 
-            if( _byId[ id ] || _byId[ cid ] ) continue;
+            //if( _byId[ id ] || _byId[ cid ] ) continue;
 
             model = _prevById[ id ] || _prevById[ cid ];
         }
