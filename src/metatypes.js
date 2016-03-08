@@ -19,7 +19,7 @@ attribute.Type.extend( {
 
     clone : function( value, options ){
         // delegate to clone function or deep clone through serialization
-        return value.clone ? value.clone( value, options ) : this.cast( JSON.parse( JSON.stringify( value ) ) );
+        return value ? (value.clone ? value.clone( value, options ) : this.cast( JSON.parse( JSON.stringify( value ) ) ) ): null;
     }
 } ).attach( Function.prototype );
 
