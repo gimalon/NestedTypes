@@ -3764,6 +3764,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.silent = options.silent;
 	    this.parse  = options.parse;
 	    this.merge  = options.merge;
+	    this.remove  = options.remove;
+	    this.add     = options.add;
+	
 	
 	    // at option
 	    var at = options.at;
@@ -3964,23 +3967,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// reallocate model and index
 	function _reallocate( self, source, options ){
-	    var models      = Array( source.length ),
-	        _byId       = {},
+	    var remove       = options.remove == null ? true : options.remove,
+	        models      =  remove ? Array( source.length ): self.models ,
+	        _byId       =  remove ? {}: self._byId,
+	        j           =  remove ? 0 : self.models.length,
 	        merge       = options.merge == null ? true : options.merge,
 	        _prevById   = self._byId,
 	        idAttribute = self.model.prototype.idAttribute,
 	        toAdd       = [];
 	
-	    // for each item in source set...
-	    for( var i = 0, j = 0; i < source.length; i++ ){
+	
+	    for ( var i = 0; i < source.length; i++ ){
 	        var item  = source[ i ],
 	            model = null;
 	
 	        if( item ){
 	            var id  = item[ idAttribute ],
 	                cid = item.cid;
-	
-	            if( _byId[ id ] || _byId[ cid ] ) continue;
 	
 	            model = _prevById[ id ] || _prevById[ cid ];
 	        }
@@ -3992,7 +3995,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                model.set( attrs, options );
 	            }
 	        }
-	        else{
+	
+	        if( _byId[ id ] || _byId[ cid ] ) continue;
+	
+	        if( !model ) {
 	            model = toModel( self, item, options );
 	            addReference( self, model );
 	            toAdd.push( model );
@@ -4008,6 +4014,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return toAdd;
 	}
+
 
 /***/ },
 /* 17 */
@@ -4252,7 +4259,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    if( models ){
 	        if( models instanceof Array && models.length && typeof models[ 0 ] !== 'object' ){
-	            adjust.merge = adjust.parse = true;
+	            adjust.remove = adjust.merge = adjust.parse = true;
 	        }
 	    }
 	
@@ -4388,7 +4395,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    clone : function( value, options ){
 	        // delegate to clone function or deep clone through serialization
-	        return value.clone ? value.clone( value, options ) : this.cast( JSON.parse( JSON.stringify( value ) ) );
+	        return value ? (value.clone ? value.clone( value, options ) : this.cast( JSON.parse( JSON.stringify( value ) ) ) ): null;
 	    }
 	} ).attach( Function.prototype );
 	

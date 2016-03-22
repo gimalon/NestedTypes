@@ -24,6 +24,7 @@ var MergeOptions = exports.MergeOptions = function( a_options, collection ){
     this.parse  = options.parse;
     this.merge  = options.merge;
     this.remove  = options.remove;
+    this.add     = options.add;
 
 
     // at option
@@ -235,15 +236,13 @@ function _reallocate( self, source, options ){
         toAdd       = [];
 
 
-    for( var i = 0; i < source.length; i++ ){
+    for ( var i = 0; i < source.length; i++ ){
         var item  = source[ i ],
             model = null;
 
         if( item ){
             var id  = item[ idAttribute ],
                 cid = item.cid;
-
-            //if( _byId[ id ] || _byId[ cid ] ) continue;
 
             model = _prevById[ id ] || _prevById[ cid ];
         }
@@ -255,7 +254,10 @@ function _reallocate( self, source, options ){
                 model.set( attrs, options );
             }
         }
-        else{
+
+        if( _byId[ id ] || _byId[ cid ] ) continue;
+
+        if( !model ) {
             model = toModel( self, item, options );
             addReference( self, model );
             toAdd.push( model );
