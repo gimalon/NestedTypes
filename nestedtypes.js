@@ -3935,7 +3935,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    collection._changed = addedOrChanged || removed || _changed;
 	
-	    if( needSort ){ collection.sort( silence ) }
+	    if( needSort ){
+	        collection.sort( silence )
+	
+	        // `added` might have a different sort order than `collection`
+	        // In an ideal world, we would just call `added.sort`, however, under Chrome [].sort is not stable
+	        // The following code creates an array `added` that has the same ordering as `collection.models`
+	        var addedMap = {}
+	        for ( var i = 0; i < added.length; i++ ) {
+	            m = added[i];
+	            addedMap[m.id] = m
+	        }
+	
+	        addedPrev = added
+	        added = []
+	        for (var i = 0; i < collection.models.length; i++ ) {
+	            m = collection.models[i]
+	            if (addedMap[m.id]) {
+	                added.push(m)
+	            }
+	        }
+	    }
 	
 	    if( removed ){
 	        _garbageCollect( collection, previous, options );
@@ -3968,22 +3988,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	// reallocate model and index
 	function _reallocate( self, source, options ){
 	    var remove       = options.remove == null ? true : options.remove,
-	        models      =  remove ? Array( source.length ): self.models ,
-	        _byId       =  remove ? {}: self._byId,
+	        models      =  remove ? Array( source.length ): _.clone( self.models ),
+	        _byId       =  remove ? {}: _.clone( self._byId ),
 	        j           =  remove ? 0 : self.models.length,
 	        merge       = options.merge == null ? true : options.merge,
-	        _prevById   = self._byId,
+	        _prevById   = _.clone( self._byId ),
 	        idAttribute = self.model.prototype.idAttribute,
 	        toAdd       = [];
 	
 	
 	    for ( var i = 0; i < source.length; i++ ){
 	        var item  = source[ i ],
-	            model = null;
+	            model = null,
+	            id = null,
+	            cid = null;
 	
 	        if( item ){
-	            var id  = item[ idAttribute ],
-	                cid = item.cid;
+	            id  = item[ idAttribute ],
+	            cid = item.cid;
 	
 	            model = _prevById[ id ] || _prevById[ cid ];
 	        }
@@ -3996,16 +4018,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	
-	        if( _byId[ id ] || _byId[ cid ] ) continue;
+	        if( (id && _byId[ id ]) || (cid && _byId[ cid ]) ) continue;
 	
 	        if( !model ) {
 	            model = toModel( self, item, options );
 	            addReference( self, model );
-	            toAdd.push( model );
 	        }
 	
 	        models[ j++ ] = model;
 	        addIndex( _byId, model );
+	        toAdd.push( model );
 	    }
 	
 	    models.length = j;
@@ -4576,8 +4598,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    initialize : function( spec ){
 	        var name               = this.name,
-	            triggerWhenChanged = this.triggerWhenChanged || spec.type.prototype.triggerWhenChanged;
-	
+	            triggerWhenChanged = this.triggerWhenChanged;
+	      
+	        if( triggerWhenChanged === undefined ) {
+	          triggerWhenChanged = spec.type.prototype.triggerWhenChanged;
+	        }
+	          
 	        this.isModel = this.type === Model || this.type.prototype instanceof Model;
 	
 	        if( triggerWhenChanged ){

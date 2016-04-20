@@ -200,8 +200,12 @@ attribute.Type.extend( {
 
     initialize : function( spec ){
         var name               = this.name,
-            triggerWhenChanged = this.triggerWhenChanged || spec.type.prototype.triggerWhenChanged;
-
+            triggerWhenChanged = this.triggerWhenChanged;
+      
+        if( triggerWhenChanged === undefined ) {
+          triggerWhenChanged = spec.type.prototype.triggerWhenChanged;
+        }
+          
         this.isModel = this.type === Model || this.type.prototype instanceof Model;
 
         if( triggerWhenChanged ){
