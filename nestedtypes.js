@@ -335,19 +335,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this._deepGet( path.split( '.' ) );
 	    },
 	
-	    deepInvalidate : function( name ){
+	    deepValidationError : function( name ){
 	        var path  = name.split( '.' ),
 	            attr  = path.pop(),
-	            model = this._deepGet( path ),
-	            error, value;
+	            model = this._deepGet( path ) || null;
 	
-	        if( model ){
-	            value = model.get ? model.get( attr ) : model[ attr ];
-	            error = model.validationError;
-	            if( error ) error = error.nested[ attr ];
-	        }
-	
-	        return [ value, error ];
+	        return model && model.getValidationError( attr );
 	    },
 	
 	    _deepGet : function( path ){
@@ -2851,9 +2844,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return 0;
 	    },
 	
-	    isValid : function( key ){
+	    getValidationError : function( key ){
 	        var error = this.validationError;
-	        return !error || ( Boolean( key ) && !error.nested[ key ] );
+	        return ( key ? error && error.nested[ key ] : error ) || null;
+	    },
+	
+	    /**
+	     * Extended Backbone API
+	     * @param {string} key - nested object key
+	     * @returns {boolean}
+	     */
+	    isValid : function( key ){
+	        return !this.getValidationError( key );
 	    },
 	
 	    _invalidate : function( options ){
@@ -4660,9 +4662,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var fetch = element.fetch;
 	
 	            if( fetch ){
-	                element.fetch = function(){
-	                    self._resolved[ name ] = true;
-	                    return fetch.apply( this, arguments );
+	                element.fetch = function() {
+	                    return self._resolved[ name ] = fetch.apply( this, arguments );
 	                }
 	            }
 	
@@ -4681,6 +4682,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _.each( objsToFetch, function( name ){
 	            var attr = this.attributes[name];
 	            attr && attr.fetch && xhr.push( attr.fetch() );
+	        }, this );
+	
+	        return $ && $.when && $.when.apply( Backbone.$, xhr );
+	    },
+	
+	    // fetch specified items, or all items if called without arguments.
+	    // returns first jquery promise.
+	    fetchOnce : function(){
+	        var xhr         = [],
+	            self        = this,
+	            objsToFetch = arguments.length ? arguments : _.keys( this.attributes );
+	
+	        _.each( objsToFetch, function( name ){
+	            var attr = self.attributes[ name ];
+	            self._resolved[ name ] || attr && attr.fetch && xhr.push( attr.fetch() );
 	        }, this );
 	
 	        return $ && $.when && $.when.apply( Backbone.$, xhr );
@@ -4715,9 +4731,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _.each( spec, function( Type, name ){
 	            Type.options && ( spec[name] = Type.options( {
 	                get : function( value ){
-	                    if( !this._resolved[name] ){
+	                    if( !this._resolved[name] ) {
 	                        value.fetch && value.fetch();
-	                        this._resolved[name] = true;
 	                    }
 	
 	                    return value;

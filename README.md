@@ -1,5 +1,7 @@
 # NestedTypes model framework
 
+> Version 2.0 RC is in `develop` branch now. Use with care, as it enforces ownership policy. It's several times faster than the current version in all browsers. Designed with ES6 classes support, and ability to handle 10K collections of complex objects with subsecond real-time response in all browsers. Stay tuned.
+
 master: [![Master Build Status](https://travis-ci.org/Volicon/NestedTypes.svg?branch=master)](https://travis-ci.org/Volicon/NestedTypes)
 develop: [![Develop Build Status](https://travis-ci.org/Volicon/NestedTypes.svg?branch=develop)](https://travis-ci.org/Volicon/NestedTypes)
 
