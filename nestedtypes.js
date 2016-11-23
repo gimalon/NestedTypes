@@ -3639,6 +3639,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var options = a_options || {};
 	    this.parse  = options.parse;
 	    this.sort   = options.sort;
+	
+	    /* allow to pass custom options */
+	    this.custom = options.custom;
 	}
 	
 	SilentOptions.prototype = silence;
@@ -3692,6 +3695,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function ModelOptions( options, collection ){
 	    this.parse      = options.parse;
 	    this.collection = collection;
+	
+	    /* allow to pass custom options */
+	    this.custom = options.custom;
 	}
 	
 	// convert argument to model. Return false if fails.
@@ -3769,6 +3775,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.remove  = options.remove;
 	    this.add     = options.add;
 	
+	    /* allow to pass custom options */
+	    this.custom = options.custom;
 	
 	    // at option
 	    var at = options.at;
@@ -4061,6 +4069,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function RemoveOptions( options ){
 	    this.silent = options.silent;
+	
+	    /* allow to pass custom options */
+	    this.custom = options.custom;
 	}
 	
 	RemoveOptions.prototype = {

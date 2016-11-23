@@ -26,6 +26,8 @@ var MergeOptions = exports.MergeOptions = function( a_options, collection ){
     this.remove  = options.remove;
     this.add     = options.add;
 
+    /* allow to pass custom options */
+    this.custom = options.custom;
 
     // at option
     var at = options.at;

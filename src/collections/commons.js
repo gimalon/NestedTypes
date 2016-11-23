@@ -33,6 +33,9 @@ function SilentOptions( a_options ){
     var options = a_options || {};
     this.parse  = options.parse;
     this.sort   = options.sort;
+
+    /* allow to pass custom options */
+    this.custom = options.custom;
 }
 
 SilentOptions.prototype = silence;
@@ -86,6 +89,9 @@ function removeIndex( _byId, model ){
 function ModelOptions( options, collection ){
     this.parse      = options.parse;
     this.collection = collection;
+
+    /* allow to pass custom options */
+    this.custom = options.custom;
 }
 
 // convert argument to model. Return false if fails.

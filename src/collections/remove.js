@@ -15,6 +15,9 @@ var Events   = require( '../backbone+' ).Events,
 
 function RemoveOptions( options ){
     this.silent = options.silent;
+
+    /* allow to pass custom options */
+    this.custom = options.custom;
 }
 
 RemoveOptions.prototype = {
